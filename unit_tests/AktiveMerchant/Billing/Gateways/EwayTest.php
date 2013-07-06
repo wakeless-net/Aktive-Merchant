@@ -64,7 +64,20 @@ class EwayTest extends AktiveMerchant\TestCase
         );
 
         $this->assert_success($response);
+
+        $request_body = $this->request->getBody();
+        $this->assertEquals(
+            $this->purchase_request($this->options['order_id']),
+            $request_body
+        );
+
     }
+    
+    private function purchase_request($order_id)
+    {
+        return "<?xml version=\"1.0\"?>\n<ewaygateway><ewayCustomerInvoiceRef>{$order_id}</ewayCustomerInvoiceRef><ewayCustomerInvoiceDescription>Eway Test Transaction</ewayCustomerInvoiceDescription><ewayCardNumber>4444333322221111</ewayCardNumber><ewayCardExpiryMonth>01</ewayCardExpiryMonth><ewayCardExpiryYear>15</ewayCardExpiryYear><ewayCustomerFirstName>John</ewayCustomerFirstName><ewayCustomerLastName>Doe</ewayCustomerLastName><ewayCardHoldersName>John Doe</ewayCardHoldersName><ewayCVN>000</ewayCVN><ewayCustomerAddress>1234 Street, 98004, WA</ewayCustomerAddress><ewayCustomerPostcode>98004</ewayCustomerPostcode><ewayCustomerEmail>test@example.com</ewayCustomerEmail><ewayTrxnNumber/><ewayOption1/><ewayOption2/><ewayOption3/><ewayTotalAmount>10000</ewayTotalAmount><ewayCustomerID>87654321</ewayCustomerID></ewaygateway>\n";
+    }
+
     private function successful_purchase_response()
     {
         return "<ewayResponse><ewayTrxnStatus>True</ewayTrxnStatus><ewayTrxnNumber>1010222</ewayTrxnNumber><ewayTrxnReference/><ewayTrxnOption1/><ewayTrxnOption2/><ewayTrxnOption3/><ewayAuthCode>123456</ewayAuthCode><ewayReturnAmount>10000</ewayReturnAmount><ewayTrxnError>00,Transaction Approved(Test Gateway)</ewayTrxnError></ewayResponse>";
@@ -81,10 +94,51 @@ class EwayTest extends AktiveMerchant\TestCase
         );
 
         $this->assert_success($response);
+
+        $request_body = $this->request->getBody();
+        $this->assertEquals(
+            $this->authorize_request($this->options['order_id']),
+            $request_body
+        );
+    }
+
+    private function authorize_request($order_id)
+    {
+        return "<?xml version=\"1.0\"?>\n<ewaygateway><ewayCustomerInvoiceRef>{$order_id}</ewayCustomerInvoiceRef><ewayCustomerInvoiceDescription>Eway Test Transaction</ewayCustomerInvoiceDescription><ewayCardNumber>4444333322221111</ewayCardNumber><ewayCardExpiryMonth>01</ewayCardExpiryMonth><ewayCardExpiryYear>15</ewayCardExpiryYear><ewayCustomerFirstName>John</ewayCustomerFirstName><ewayCustomerLastName>Doe</ewayCustomerLastName><ewayCardHoldersName>John Doe</ewayCardHoldersName><ewayCVN>000</ewayCVN><ewayCustomerAddress>1234 Street, 98004, WA</ewayCustomerAddress><ewayCustomerPostcode>98004</ewayCustomerPostcode><ewayCustomerEmail>test@example.com</ewayCustomerEmail><ewayTrxnNumber/><ewayOption1/><ewayOption2/><ewayOption3/><ewayTotalAmount>10000</ewayTotalAmount><ewayCustomerID>87654321</ewayCustomerID></ewaygateway>\n";
     }
 
     private function successful_authorize_response()
     {
         return "<ewayResponse><ewayTrxnStatus>True</ewayTrxnStatus><ewayTrxnNumber>10170</ewayTrxnNumber><ewayTrxnReference/><ewayTrxnOption1/><ewayTrxnOption2/><ewayTrxnOption3/><ewayAuthCode>123456</ewayAuthCode><ewayReturnAmount>10000</ewayReturnAmount><ewayTrxnError>00,Transaction Approved(Test CVN Gateway)</ewayTrxnError></ewayResponse>";
+    }
+
+    public function testSuccessfulCapture()
+    {
+        $this->mock_request($this->successful_capture_response());
+        
+        $response = $this->gateway->capture(
+            $this->amount, 
+            $this->options["order_id"],
+            $this->options
+        );
+
+        $this->assert_success($response);
+
+        $request_body = $this->request->getBody();
+        $this->assertEquals(
+            $this->capture_request($this->options['order_id']),
+            $request_body
+        );
+    }
+
+    private function capture_request($order_id)
+    {
+        return "<?xml version=\"1.0\"?>\n<ewaygateway><ewayAuthTrxnNumber>{$order_id}</ewayAuthTrxnNumber><ewayTotalAmount>10000</ewayTotalAmount><ewayCardNumber/><ewayCardExpiryMonth></ewayCardExpiryMonth><ewayCardExpiryYear></ewayCardExpiryYear><ewayCustomerFirstName/><ewayCustomerLastName/><ewayCardHoldersName> </ewayCardHoldersName><ewayTrxnNumber/><ewayOption1/><ewayOption2/><ewayOption3/><ewayCustomerID>87654321</ewayCustomerID></ewaygateway>
+";
+    }
+
+    private function successful_capture_response()
+    {
+        return "<ewayResponse><ewayTrxnError>00,Transaction Approved</ewayTrxnError><ewayTrxnStatus>True</ewayTrxnStatus><ewayTrxnNumber>9876543210</ewayTrxnNumber><ewayTrxnOption1>optional 1</ewayTrxnOption1><ewayTrxnOption2>optional 2</ewayTrxnOption2><ewayTrxnOption3>optional 3</ewayTrxnOption3><ewayReturnAmount>10</ewayReturnAmount><ewayAuthCode>012345</ewayAuthCode><ewayTrxnReference>12345678</ewayTrxnReference></ewayResponse>";
     }
 }
