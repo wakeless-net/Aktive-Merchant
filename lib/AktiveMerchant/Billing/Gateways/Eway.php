@@ -211,6 +211,10 @@ class Eway extends Gateway implements
         $this->post['TotalAmount'] = $this->amount($money);
 
         $this->post['RefundPassword'] = $options['password'];
+        $this->post["CardExpiryMonth"] = "";
+        $this->post["CardExpiryYear"] = "";
+
+        $this->add_optional_data();
 
         return $this->commit('xmlpaymentrefund', $money);
     }
@@ -435,7 +439,8 @@ class Eway extends Gateway implements
         $lookup = array(
             "xmlauth" => "authtestpage",
             "xmlauthcomplete" => "authcompletetestpage",
-            "xmlauthvoid" => "authvoidetestpage"
+            "xmlauthvoid" => "authvoidetestpage",
+            "xmlpaymentrefund" => "refund_test"
         );
 
         if(isset($lookup[$live_endpoint])) {
