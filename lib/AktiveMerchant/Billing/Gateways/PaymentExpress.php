@@ -35,6 +35,7 @@ class PaymentExpress extends Gateway implements
       const APPROVED = '1';
 
       public static $TRANSACTIONS = array(
+        'purchase'       => "Purchase",
         'credit'         => 'Refund',
         'authorization'  => 'Auth',
         'capture'        => 'Complete',
