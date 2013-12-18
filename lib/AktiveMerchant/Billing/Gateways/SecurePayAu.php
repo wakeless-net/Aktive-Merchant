@@ -229,7 +229,7 @@ class SecurePayAu extends Gateway implements
 
 
     function ssl_post($endpoint, $data, $options = array()) {
-        $options = $options + array("headers" => array("Content-Type: text/xml;charset=ISO-8859-1"));
+        $options = $options + array("timeout" => self::$request_timeout + 2);
         return parent::ssl_post($endpoint, $data, $options);
     }
 

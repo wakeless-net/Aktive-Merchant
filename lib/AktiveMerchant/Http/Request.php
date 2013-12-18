@@ -80,7 +80,9 @@ class Request implements RequestInterface
 
         $this->setMethod($method);
 
-        $this->options = new Options($options);
+        $this->config = $options + $this->config;
+
+        #$this->options = new Options($options);
     }
 
     public function getAdapter()
