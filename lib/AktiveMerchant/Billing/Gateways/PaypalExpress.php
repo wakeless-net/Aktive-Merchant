@@ -127,6 +127,7 @@ class PaypalExpress extends PaypalCommon
             $this->post['AMT'] = $this->amount($money);
 
         $this->post['TRANSACTIONID'] = $identification;
+        $this->post["NOTE"] = $options["note"];
 
         $this->post = array_merge(
             $this->post, 
