@@ -182,8 +182,8 @@ class PayWay extends Gateway implements
         'card.cardHolderName' => "#{$card->first_name} #{$card->last_name}",
         'card.PAN'            => $card->number,
         'card.CVN'            => $card->verification_value,
-        'card.expiryYear'     => $card->year,
-        'card.expiryMonth'    => sprintf('%02d', $card->month),
+        'card.expiryYear'     => $this->cc_format($card->year, "two_digits"),
+        'card.expiryMonth'    => $this->cc_format($card->month, 'two_digits'),
         'card.currency'       => $this->options['currency']
       ));
     }
