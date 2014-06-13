@@ -5,6 +5,7 @@ namespace AktiveMerchant\Billing\Gateways;
 use AktiveMerchant\Billing\Interfaces as Interfaces;
 use AktiveMerchant\Billing\Gateway;
 use AktiveMerchant\Billing\Response;
+use AktiveMerchant\HTTP\Request;
 use AktiveMerchant\Billing\CreditCard;
 
 class PayWay extends Gateway implements 
@@ -97,11 +98,12 @@ class PayWay extends Gateway implements
    function __construct($options = array()) {
     $this->required_options(array('username', 'password', 'pem'), $options);
     $this->options = $options;
-    
+
     @$this->options['eci'] = $this->options["eci"]       ?: 'SSL';
     @$this->options['currency'] = $this->options["currency"] ?: self::$default_currency;
     @$this->options['merchant'] = $this->options["merchant"]  ?: 'TEST';
-    @$this->options['pem'] = $this->options["pem"]         = $this->options['pem'];
+    @$this->options['pem'] = $this->options["pem"];
+    @$this->options['pem_password'] = $this->options["pem_password"];
     
     $this->post = array();
     $this->transaction = array();
@@ -116,7 +118,7 @@ class PayWay extends Gateway implements
       'credit_card'  => $credit_card
     ));
     
-    $this->build_card();
+    if(!in_array($action, ["capture", "credit"])) $this->build_card();
     $this->build_order();
     $this->build_customer();
     
@@ -127,8 +129,7 @@ class PayWay extends Gateway implements
     $this->required_options(array('order_number'), $options);
     
     $this->transaction = array_merge($this->transaction, array('order_number' => $options['order_number'] ));
-    
-    return $this->process('authorize', $amount, $credit_card);
+    return $this->process('authorization', $amount, $credit_card);
   }
   
    function capture($amount, $credit_card, $options = array()) {
@@ -158,7 +159,7 @@ class PayWay extends Gateway implements
       'original_order_number'  => $options['original_order_number']
     ));
     
-    return $this->process('credit', $amount, $credit_card);
+    return $this->process('credit', $amount, @new CreditCard([]));
   }
 
   function void($authorization, $options = array()) { //do nothing 
@@ -179,7 +180,7 @@ class PayWay extends Gateway implements
     function build_card() {
       $card = $this->transaction['credit_card'];
       $this->post = array_merge($this->post, array(
-        'card.cardHolderName' => "#{$card->first_name} #{$card->last_name}",
+        'card.cardHolderName' => "{$card->first_name} {$card->last_name}",
         'card.PAN'            => $card->number,
         'card.CVN'            => $card->verification_value,
         'card.expiryYear'     => $this->cc_format($card->year, "two_digits"),
@@ -190,14 +191,15 @@ class PayWay extends Gateway implements
     
     # Adds the order arguments to the post hash
     function build_order() {
-      array_merge($this->post, array(
+      $this->post = array_merge($this->post, array(
         'order.ECI'           => $this->options['eci'],
         'order.amount'        => $this->transaction['amount'],
         'order.type'          => self::$TRANSACTIONS[$this->transaction['type']]
       ));
+
       
       if(isset($this->transaction['original_order_number'])) {
-        $this->post['order.originalOrderNumber'] = $this->transaction['original_order_number'];
+        $this->post['customer.originalOrderNumber'] = $this->transaction['original_order_number'];
       }
     }
     
@@ -207,16 +209,19 @@ class PayWay extends Gateway implements
         'customer.username'   => $this->options['username'],
         'customer.password'   => $this->options['password'],
         'customer.merchant'   => $this->options['merchant'],
-        'customer.orderNumber'=> "#{$this->transaction['order_number']} - ".time()
+        'customer.orderNumber'=> "{$this->transaction['order_number']}"
       ));
     }
     
     # Creates the request and returns the sumarised result
     function send_post() {
-      $this->request = http_build_query($this->post);
+      $body = http_build_query($this->post);
 
-      $this->response = $this->ssl_post(self::$URL, $this->request);
-      
+      $this->response = $this->ssl_post(self::$URL, $body, [
+        "pem" => @$this->options["pem"],
+        "pem_password" => @$this->options["pem_password"]
+      ]);
+
       return $this->process_response();
     }
     
@@ -240,3 +245,4 @@ class PayWay extends Gateway implements
       return new Response($success, $msg, $params, $options);
     }
 }
+
