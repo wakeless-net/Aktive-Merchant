@@ -56,6 +56,8 @@ class cUrl implements AdapterInterface
         'ssl_verify_peer' => CURLOPT_SSL_VERIFYPEER,
         'ssl_verify_host' => CURLOPT_SSL_VERIFYHOST,
         'user_agent'      => CURLOPT_USERAGENT,
+        "pem"             => CURLOPT_SSLCERT,
+        "pem_password"    => CURLOPT_SSLCERTPASSWD
     );
 
     /**
@@ -217,7 +219,7 @@ class cUrl implements AdapterInterface
             // Do not use cached connection
             CURLOPT_FRESH_CONNECT   => 1,
             CURLOPT_CONNECTTIMEOUT  => 5,
-            CURLOPT_TIMEOUT         => 7
+            CURLOPT_TIMEOUT         => 7,
         );
 
         $config = $this->map_config($request->getConfig());
