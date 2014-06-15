@@ -114,7 +114,7 @@ class PayWay extends Gateway implements
     
     $this->transaction = array_merge($this->transaction, array(
       'type'         => $action,
-      'amount'       => $amount,
+      'amount'       => $this->amount($amount),
       'credit_card'  => $credit_card
     ));
     
