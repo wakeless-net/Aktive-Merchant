@@ -227,6 +227,7 @@ class Country
         array('alpha2' => 'IN', 'name' => 'India', 'alpha3' => 'IND', 'numeric' => '356'),
         array('alpha2' => 'ID', 'name' => 'Indonesia', 'alpha3' => 'IDN', 'numeric' => '360'),
         array('alpha2' => 'IR', 'name' => 'Iran, Islamic Republic of', 'alpha3' => 'IRN', 'numeric' => '364'),
+        array('alpha2' => 'IR', 'name' => 'Iran', 'alpha3' => 'IRN', 'numeric' => '364'),
         array('alpha2' => 'IQ', 'name' => 'Iraq', 'alpha3' => 'IRQ', 'numeric' => '368'),
         array('alpha2' => 'IE', 'name' => 'Ireland', 'alpha3' => 'IRL', 'numeric' => '372'),
         array('alpha2' => 'IM', 'name' => 'Isle Of Man', 'alpha3' => 'IMN', 'numeric' => '833'),
