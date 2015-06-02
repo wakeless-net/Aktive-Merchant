@@ -57,7 +57,7 @@ class SecurePayAu extends Gateway implements
       # 6 Client Reversal (Void)
       # 10 Preauthorise
       # 11 Preauth Complete (Advice)
-      static private $TRANSACTIONS = array( 
+      static protected $TRANSACTIONS = array( 
         'purchase' => 0,
         'authorization' => 10,
         'capture' => 11,
@@ -65,19 +65,19 @@ class SecurePayAu extends Gateway implements
         'refund' => 4
       );
 
-    static private $PERIODIC_ACTIONS = array(
+    static protected $PERIODIC_ACTIONS = array(
         'add_triggered'    => "add",
         'remove_triggered' => "delete",
         'trigger'          => "trigger"
       );
 
-      static private $PERIODIC_TYPES = array(
+      static protected $PERIODIC_TYPES = array(
         'add_triggered'    => 4,
         'remove_triggered' => null,
         'trigger'          => null
       );
 
-      static private $SUCCESS_CODES = [ '00', '08', '11', '16', '77' ];
+      static protected $SUCCESS_CODES = [ '00', '08', '11', '16', '77' ];
 
       function __construct($options = array()) {
         $this->required_options(array('login', 'password'), $options);
@@ -158,7 +158,7 @@ class SecurePayAu extends Gateway implements
       }
 
       function currency() {
-        return self::$default_currency;
+        return static::$default_currency;
       }
 
       function build_base_xml() {
@@ -180,7 +180,7 @@ class SecurePayAu extends Gateway implements
       }
 
       function request_timeout() {
-        return self::$request_timeout;
+        return static::$request_timeout;
       }
 
       function addBaseMessages($xml) {
@@ -188,7 +188,7 @@ class SecurePayAu extends Gateway implements
         $messageInfo->addChild("messageID", substr($this->generateUniqueId(), 0, 30));
         $messageInfo->addChild("messageTimestamp", $this->generate_timestamp());
         $messageInfo->addChild("timeoutValue", $this->request_timeout());
-        $messageInfo->addChild("apiVersion", self::API_VERSION);
+        $messageInfo->addChild("apiVersion", static::API_VERSION);
 
         $merchantInfo = $xml->addChild("MerchantInfo");
         $merchantInfo->addChild("merchantID", $this->options['login']);
@@ -210,7 +210,7 @@ class SecurePayAu extends Gateway implements
 
         $txn = $txnList->addChild("Txn", new \SimpleXMLElement($body));
         $txn["ID"] = 1;
-        $txn->addChild("txnType", self::$TRANSACTIONS[$action]);
+        $txn->addChild("txnType", static::$TRANSACTIONS[$action]);
         $txn->addChild("txnSource", 23);
 
         $dom = dom_import_simplexml($xml);
@@ -229,14 +229,15 @@ class SecurePayAu extends Gateway implements
 
 
     function ssl_post($endpoint, $data, $options = array()) {
-        $options = $options + array("timeout" => self::$request_timeout + 2);
+        $options = $options + array("timeout" => static::$request_timeout + 2);
         return parent::ssl_post($endpoint, $data, $options);
     }
 
     function commit($action, $request) {
         $response = $this->parse(
+            $str = 
             $this->ssl_post(
-                $this->isTest() ? self::$test_url : self::$live_url, 
+                $this->isTest() ? static::$test_url : static::$live_url, 
                 $this->build_request($action, $request)
             )
         );
@@ -247,15 +248,15 @@ class SecurePayAu extends Gateway implements
 
       function build_periodic_item($action, $money, $credit_card, $options) {
         $xml = $this->build_base_xml();
-        $xml->addChild("actionType", self::$PERIODIC_ACTIONS[$action]);
+        $xml->addChild("actionType", static::$PERIODIC_ACTIONS[$action]);
         $xml->addChild("clientID", $options['billing_id']);
 
         if(!$credit_card instanceof StoredCreditCard) $this->addCCInfo($xml, $credit_card);
         $xml->addChild("amount", $this->amount($money));
 
-        if(self::$PERIODIC_TYPES[$action]) {
+        if(static::$PERIODIC_TYPES[$action]) {
 
-            $xml->addChild("periodicType", self::$PERIODIC_TYPES[$action]);
+            $xml->addChild("periodicType", static::$PERIODIC_TYPES[$action]);
         }
         return $xml->asXML();
     }
@@ -283,7 +284,7 @@ class SecurePayAu extends Gateway implements
     function commit_periodic($request) {
         $response = $this->parse(
             $this->ssl_post(
-                $this->isTest() ? self::$test_periodic_url : self::$live_periodic_url, 
+                $this->isTest() ? static::$test_periodic_url : static::$live_periodic_url, 
                 $this->build_periodic_request($request)
             )
         );
@@ -298,7 +299,7 @@ class SecurePayAu extends Gateway implements
     }
 
     function isSuccess($response) {
-        return in_array($response["response_code"], self::$SUCCESS_CODES);
+        return in_array($response["response_code"], static::$SUCCESS_CODES);
     }
 
 
