@@ -30,10 +30,10 @@ class SecurePayAu extends Gateway implements
       const API_VERSION = 'xml-4.2';
       const PERIODIC_API_VERSION = 'spxml-3.0';
 
-      public static $test_url = 'https://www.securepay.com.au/test/payment';
+      public static $test_url = 'https://api.securepay.com.au/test/payment';
       public static $live_url = 'https://api.securepay.com.au/xmlapi/payment';
 
-      public static $test_periodic_url = 'https://test.securepay.com.au/xmlapi/periodic';
+      public static $test_periodic_url = 'https://api.securepay.com.au/xmlapi/periodic';
       public static $live_periodic_url = 'https://api.securepay.com.au/xmlapi/periodic';
 
       public static $supported_countries = array('AU');
