@@ -169,10 +169,10 @@ abstract class Gateway
         if (!is_numeric($money) || $money < 0) {
             throw new \InvalidArgumentException('money amount must be a positive number.');
         }
-        
+
         return ($this->money_format() == 'cents') 
             ? number_format($cents, 0, '', '') 
-            : number_format($money, 2, "", "");
+            : number_format($money, 2, ".", "");
     }
 
     protected function card_brand($source)
