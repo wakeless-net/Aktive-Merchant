@@ -393,7 +393,7 @@ class Eway extends Gateway implements
 
         foreach ($this->post as $name => $value) {
 
-            $xml->addChild("eway$name", $value);
+            $xml->addChild("eway$name", htmlspecialchars($value));
         }
 
         return $xml->asXML(); 
