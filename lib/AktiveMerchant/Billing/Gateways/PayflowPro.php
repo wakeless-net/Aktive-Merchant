@@ -43,7 +43,7 @@ class PayflowPro extends PayflowProCommon
             $options
         );
 
-        $this->commit();
+        return $this->commit();
     }
 
     function purchase($money, $credit_card_or_reference, $options = array())
@@ -54,6 +54,8 @@ class PayflowPro extends PayflowProCommon
             $credit_card_or_reference,
             $options
         );
+
+        return $this->commit();
     }
 
     function build_post_data($action, $money, $credit_card_or_reference, $options)

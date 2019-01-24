@@ -31,6 +31,18 @@ class PayflowProCommon extends Gateway
         $response = $this->parse(
             $this->ssl_post($url, $this->post_data())
         );
+
+        return $this->build_response($this->success_from($response), $this->message_from($response), $response, $options);
+    }
+
+    private function success_from($response)
+    {
+        return (in_array($response['ACK'], $this->SUCCESS_CODES));
+    }
+
+    private function message_from($response)
+    {
+        return ( isset($response['L_LONGMESSAGE0']) ? $response['L_LONGMESSAGE0'] : $response['ACK'] );
     }
 
     private function parse($response)
