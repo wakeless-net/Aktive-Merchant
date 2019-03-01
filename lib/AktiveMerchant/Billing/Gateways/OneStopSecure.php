@@ -8,7 +8,7 @@ use AktiveMerchant\Http\Request;
 class OneStopSecure extends Gateway {
 
     const TEST_URL = 'https://anu-test.onestopsecure.com/OneStopWeb/EP/tranadd';
-    const LIVE_URL = 'https://anu.onestopsecure.com/OneStopWeb/EP/tran';
+    const LIVE_URL = 'https://anu.onestopsecure.com/OneStopWeb/EP/tranadd';
 
     protected $options;
     protected $post = array(
