@@ -74,6 +74,29 @@ class PayWayREST extends GateWay {
             $response);
     }
 
+    function authorize($transaction, $data) {
+        $endpoint = "/transactions";
+        $token = $this->createSingleUseTokenId(
+            $this->build_credit_card($transaction)
+        );
+
+        $response = $this->parse(
+            $this->ssl_request($endpoint, 'POST', array(
+                "singleUseTokenId" => $token,
+                "customerNumber" => uniqid("Currinda") . time(),
+                "transactionType" => "preAuth",
+                "principalAmount" => $transaction->payment(),
+                "currency" => strtolower($this->options['currency']),
+                "merchantId" => $this->options["merchant_id"],
+                "customerIpAddress" => $this->options['ip']
+            ), $this->options["secret_key"]));
+
+        return $this->build_response(
+            $this->success_from($response), 
+            $this->message_from($response), 
+            $response);
+    }
+
     private function parse($body) {
         return json_decode($body, true);
     }
