@@ -60,7 +60,7 @@ class PayWayREST extends GateWay {
         $response = $this->parse(
             $this->ssl_request($endpoint, 'POST', array(
                 "singleUseTokenId" => $token,
-                "customerNumber" => uniqid("Currinda") . time(),
+                "customerNumber" => uniqid() . date("His"),
                 "transactionType" => "payment",
                 "principalAmount" => $transaction->payment(),
                 "currency" => strtolower($this->options['currency']),
@@ -83,7 +83,7 @@ class PayWayREST extends GateWay {
         $response = $this->parse(
             $this->ssl_request($endpoint, 'POST', array(
                 "singleUseTokenId" => $token,
-                "customerNumber" => uniqid("Currinda") . time(),
+                "customerNumber" => uniqid() . date("His"),
                 "transactionType" => "preAuth",
                 "principalAmount" => $transaction->payment(),
                 "currency" => strtolower($this->options['currency']),
