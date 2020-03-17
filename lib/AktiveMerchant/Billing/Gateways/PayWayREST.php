@@ -107,7 +107,7 @@ class PayWayREST extends GateWay {
             $this->ssl_request($endpoint, 'POST', array(
                 "transactionType" => "refund",
                 "parentTransactionId" => $reference,
-                "principalAmount" => $transaction->payment(),
+                "principalAmount" => $money,
                 "customerIpAddress" => $this->options['ip']
             ), $this->options["secret_key"]));
 
