@@ -97,7 +97,8 @@ class PayWayREST extends GateWay {
             $response);
     }
 
-    function refund($money, $reference, $options = array()) {
+    function refund($transaction, $reference, $options = array()) {
+
         $endpoint = "/transactions";
         $token = $this->createSingleUseTokenId(
             $this->build_credit_card($transaction)
@@ -107,9 +108,10 @@ class PayWayREST extends GateWay {
             $this->ssl_request($endpoint, 'POST', array(
                 "transactionType" => "refund",
                 "parentTransactionId" => $reference,
-                "principalAmount" => $money,
+                "principalAmount" => abs($transaction->payment()),
                 "customerIpAddress" => $this->options['ip']
             ), $this->options["secret_key"]));
+
 
         return $this->build_response(
             $this->success_from($response), 
