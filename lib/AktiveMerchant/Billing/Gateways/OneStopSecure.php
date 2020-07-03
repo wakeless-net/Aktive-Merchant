@@ -37,8 +37,8 @@ class OneStopSecure extends Gateway {
     }
 
     protected function build_redirect_uri() {
-        if (isset($this->options['devUrl']) && isset($this->options['prodUrl'])) {
-            $url = $this->isTest() ? $this->options['devUrl'] : $this->options['prodUrl'];
+        if ($this->options['baseUrl']) {
+            $url = $this->options['baseUrl'];
         } else {
             $url = $this->isTest() ? self::TEST_URL : self::LIVE_URL;
         }
