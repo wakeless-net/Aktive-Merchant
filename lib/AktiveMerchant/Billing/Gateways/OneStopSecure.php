@@ -40,6 +40,11 @@ class OneStopSecure extends Gateway
         $this->post['SNAME'] = $data['lastName'];
         $this->post['Email'] = $data['email'];
         $this->post['UnitAmountInctax'] = $money;
+
+        if ($this->options['uds_action']) {
+            $this->post['UDS_ACTION'] = 'DEFAULT';
+            $this->post['UDS_ACTION_DATA'] = $this->options['uds_action'];
+        }
     }
 
     protected function build_redirect_uri()
